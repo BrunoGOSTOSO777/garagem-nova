@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garagem Inteligente - Manutenção</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="main-container">
+        <!-- Coluna da Garagem -->
+        <div class="garage-container">
+            <h1>Garagem Inteligente 3.0</h1>
+
+            <div class="vehicle-selector">
+                <!-- Os botões dos veículos serão gerados aqui pelo JavaScript -->
+            </div>
+
+            <div class="vehicle-panel">
+                <img id="vehicle-image" src="imagens/placeholder.jpg" alt="Imagem do Veículo">
+                
+                <div class="status-indicator-container">
+                    Status: <span id="status-indicator" class="status-off">●</span> <span id="status-text">Desligado</span>
+                </div>
+
+                <div class="speedometer-container">
+                    <label for="speed-bar">Velocidade:</label>
+                    <progress id="speed-bar" value="0" max="300"></progress>
+                    <span id="speed-text">0 km/h</span>
+                </div>
+
+                <div id="vehicle-info" class="info-box">Selecione ou adicione um veículo.</div>
+
+                <div class="controls-section">
+                    <h3>Controles Gerais</h3>
+                    <div class="button-group">
+                        <button data-action="ligar">Ligar</button>
+                        <button data-action="desligar">Desligar</button>
+                        <button data-action="acelerar">Acelerar</button>
+                        <button data-action="frear">Frear</button>
+                    </div>
+                </div>
+
+                <div id="specific-controls" class="controls-section">
+                    <!-- Controles específicos (como Turbo) aparecerão aqui -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Coluna da Manutenção e Gerenciamento -->
+        <div class="maintenance-container">
+            <h2>Gerenciar Frota e Manutenção</h2>
+
+            <!-- Formulário para Adicionar Novos Veículos -->
+            <div class="card">
+                <h3>Adicionar Novo Veículo</h3>
+                <form id="add-vehicle-form" class="form-grid">
+                    <select id="vehicle-type" required>
+                        <option value="" disabled selected>Tipo de Veículo</option>
+                        <option value="Carro">Carro</option>
+                        <option value="CarroEsportivo">Carro Esportivo</option>
+                        <option value="Caminhao">Caminhão</option>
+                    </select>
+                    <input type="text" id="vehicle-model" placeholder="Modelo (ex: Corolla)" required>
+                    <button type="submit">Adicionar à Garagem</button>
+                </form>
+            </div>
+            
+            <!-- Painel de Manutenção para o Veículo Atualmente Selecionado -->
+            <div class="card">
+                <h3 id="maintenance-title">Manutenção do Veículo</h3>
+                <div id="maintenance-history">
+                    <p>Selecione um veículo para ver o histórico.</p>
+                </div>
+
+                <h4>Agendar Novo Serviço</h4>
+                <form id="maintenance-form" class="form-grid">
+                    <input type="date" id="maint-date" required>
+                    <input type="text" id="maint-type" placeholder="Tipo (ex: Troca de óleo)" required>
+                    <input type="number" id="maint-cost" placeholder="Custo (R$)" min="0" required>
+                    <textarea id="maint-desc" placeholder="Descrição (opcional)"></textarea>
+                    <button type="submit" id="maint-submit-btn" disabled>Agendar Serviço</button>
+                </form>
+            </div>
+
+            <!-- Painel de Lembretes de Agendamentos Futuros -->
+            <div class="card">
+                <h3>Lembretes (Próximos 7 dias)</h3>
+                <div id="notifications-list">
+                    <p>Nenhum agendamento próximo.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+/* Estilos Gerais */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+    background-color: #1a1a2e;
+    color: #e0e0e0;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.main-container {
+    display: flex;
+    flex-wrap: wrap; /* Permite que as colunas quebrem em telas menores */
+    gap: 2rem;
+    width: 100%;
+    max-width: 1200px;
+}
+
+.garage-container, .maintenance-container {
+    background-color: #16213e;
+    border: 1px solid #0f3460;
+    padding: 1.5rem;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    text-align: center;
+    flex: 1; /* Ocupa espaço igualmente */
+    min-width: 400px; /* Largura mínima antes de quebrar a linha */
+}
+
+.maintenance-container {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+h1, h2, h3, h4 {
+    color: #e94560;
+    margin-top: 0;
+}
+h4 {
+    margin-bottom: 0.5rem;
+    margin-top: 1.5rem;
+    border-top: 1px solid #0f3460;
+    padding-top: 1rem;
+}
+
+/* Card Genérico */
+.card {
+    background-color: rgba(15, 52, 96, 0.5);
+    padding: 1.5rem;
+    border-radius: 10px;
+    text-align: left;
+}
+
+/* Seletor de Veículo */
+.vehicle-selector {
+    margin-bottom: 2rem;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.selector-btn {
+    background: #0f3460;
+    border: 2px solid transparent;
+    color: #e0e0e0;
+    padding: 10px 15px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.selector-btn:hover {
+    background-color: #537895;
+}
+
+.selector-btn.active {
+    background-color: #e94560;
+    border-color: #e94560;
+    box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
+}
+
+/* Painel do Veículo */
+.vehicle-panel img {
+    width: 100%;
+    max-width: 400px;
+    height: 220px;
+    object-fit: cover;
+    border-radius: 10px;
+    margin-bottom: 1.5rem;
+    background-color: #0f3460;
+}
+
+.status-indicator-container, .speedometer-container {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+#status-indicator {
+    transition: color 0.5s;
+    font-size: 1.5rem;
+    vertical-align: middle;
+}
+.status-on { color: #28a745; text-shadow: 0 0 10px #28a745; }
+.status-off { color: #dc3545; text-shadow: 0 0 10px #dc3545; }
+
+.speedometer-container progress {
+    width: 60%;
+    height: 20px;
+    vertical-align: middle;
+}
+
+.info-box {
+    background-color: rgba(15, 52, 96, 0.5);
+    border-left: 4px solid #e94560;
+    padding: 1rem;
+    margin-bottom: 2rem;
+    border-radius: 5px;
+    text-align: left;
+    white-space: pre-wrap;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+/* Controles e Formulários */
+.controls-section { margin-top: 1rem; }
+.button-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
+.button-group button, button[type="submit"] {
+    background-color: #537895;
+    border: none;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: all 0.2s ease;
+}
+.button-group button:hover, button[type="submit"]:hover { opacity: 0.8; }
+.button-group button:disabled, button[type="submit"]:disabled { background-color: #333; cursor: not-allowed; opacity: 0.7; }
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+.form-grid input, .form-grid select, .form-grid textarea {
+    background-color: #0f3460;
+    border: 1px solid #537895;
+    color: #e0e0e0;
+    padding: 10px;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-grid textarea {
+    grid-column: 1 / -1; /* Ocupa as duas colunas */
+    resize: vertical;
+}
+.form-grid button {
+    grid-column: 1 / -1;
+    background-color: #e94560;
+}
+
+/* Seção de Manutenção */
+#maintenance-history, #notifications-list {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+    border-left: 3px solid #0f3460;
+    padding-left: 15px;
+    margin-bottom: 1.5rem;
+}
+.maintenance-item, .notification-item {
+    background-color: #0f3460;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+.maintenance-item.future {
+    border-left: 3px solid #ffc107; /* Amarelo para futuro */
+}
+.maintenance-item.past {
+    border-left: 3px solid #28a745; /* Verde para passado */
+    opacity: 0.8;
+}
