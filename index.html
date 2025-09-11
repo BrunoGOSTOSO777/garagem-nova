@@ -3,22 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garagem Inteligente - Manutenção</title>
+    <title>Missão Final - Garagem Inteligente Documentada</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <div class="main-container">
-        <!-- Coluna da Garagem -->
-        <div class="garage-container">
-            <h1>Garagem Inteligente 3.0</h1>
-
-            <div class="vehicle-selector">
-                <!-- Os botões dos veículos serão gerados aqui pelo JavaScript -->
-            </div>
+    <main class="main-container">
+        <!-- Coluna da Garagem (Interação) -->
+        <section class="garage-container">
+            <header>
+                <h1>Garagem Inteligente</h1>
+                <nav class="vehicle-selector">
+                    <!-- Botões dos veículos serão gerados dinamicamente aqui -->
+                </nav>
+            </header>
 
             <div class="vehicle-panel">
-                <img id="vehicle-image" src="imagens/placeholder.jpg" alt="Imagem do Veículo">
+                <img id="vehicle-image" src="imagens/placeholder.png" alt="Imagem do Veículo Selecionado">
                 
                 <div class="status-indicator-container">
                     Status: <span id="status-indicator" class="status-off">●</span> <span id="status-text">Desligado</span>
@@ -30,11 +31,13 @@
                     <span id="speed-text">0 km/h</span>
                 </div>
 
-                <div id="vehicle-info" class="info-box">Selecione ou adicione um veículo.</div>
+                <div id="vehicle-info" class="info-box">
+                    <p>Bem-vindo! Adicione um veículo no painel à direita para começar.</p>
+                </div>
 
                 <div class="controls-section">
                     <h3>Controles Gerais</h3>
-                    <div class="button-group">
+                    <div class="button-group general-controls">
                         <button data-action="ligar">Ligar</button>
                         <button data-action="desligar">Desligar</button>
                         <button data-action="acelerar">Acelerar</button>
@@ -43,31 +46,31 @@
                 </div>
 
                 <div id="specific-controls" class="controls-section">
-                    <!-- Controles específicos (como Turbo) aparecerão aqui -->
+                    <!-- Controles específicos (Turbo, Carga) aparecerão aqui -->
                 </div>
             </div>
-        </div>
+        </section>
 
-        <!-- Coluna da Manutenção e Gerenciamento -->
-        <div class="maintenance-container">
-            <h2>Gerenciar Frota e Manutenção</h2>
+        <!-- Coluna de Gerenciamento e Manutenção -->
+        <aside class="maintenance-container">
+            <header>
+                <h2>Gerenciamento da Frota</h2>
+            </header>
 
-            <!-- Formulário para Adicionar Novos Veículos -->
             <div class="card">
                 <h3>Adicionar Novo Veículo</h3>
                 <form id="add-vehicle-form" class="form-grid">
                     <select id="vehicle-type" required>
-                        <option value="" disabled selected>Tipo de Veículo</option>
+                        <option value="" disabled selected>Selecione o Tipo</option>
                         <option value="Carro">Carro</option>
                         <option value="CarroEsportivo">Carro Esportivo</option>
                         <option value="Caminhao">Caminhão</option>
                     </select>
-                    <input type="text" id="vehicle-model" placeholder="Modelo (ex: Corolla)" required>
+                    <input type="text" id="vehicle-model" placeholder="Modelo (ex: Onix)" required>
                     <button type="submit">Adicionar à Garagem</button>
                 </form>
             </div>
             
-            <!-- Painel de Manutenção para o Veículo Atualmente Selecionado -->
             <div class="card">
                 <h3 id="maintenance-title">Manutenção do Veículo</h3>
                 <div id="maintenance-history">
@@ -75,25 +78,30 @@
                 </div>
 
                 <h4>Agendar Novo Serviço</h4>
-                <form id="maintenance-form" class="form-grid">
+                <form id="maintenance-form">
                     <input type="date" id="maint-date" required>
-                    <input type="text" id="maint-type" placeholder="Tipo (ex: Troca de óleo)" required>
-                    <input type="number" id="maint-cost" placeholder="Custo (R$)" min="0" required>
-                    <textarea id="maint-desc" placeholder="Descrição (opcional)"></textarea>
+                    <input type="text" id="maint-type" placeholder="Serviço (ex: Troca de óleo)" required>
+                    <input type="number" id="maint-cost" placeholder="Custo (R$)" min="0" step="0.01" required>
+                    <textarea id="maint-desc" placeholder="Descrição detalhada (opcional)"></textarea>
                     <button type="submit" id="maint-submit-btn" disabled>Agendar Serviço</button>
                 </form>
             </div>
 
-            <!-- Painel de Lembretes de Agendamentos Futuros -->
             <div class="card">
                 <h3>Lembretes (Próximos 7 dias)</h3>
                 <div id="notifications-list">
                     <p>Nenhum agendamento próximo.</p>
                 </div>
             </div>
-        </div>
-    </div>
+        </aside>
+    </main>
 
-    <script src="script.js"></script>
+    <!--
+      MUDANÇA IMPORTANTE:
+      - Usamos type="module" para habilitar a sintaxe de import/export do ES6.
+      - Apontamos para o 'main.js', que agora é o ponto de entrada da nossa aplicação.
+    -->
+    <script type="module" src="main.js"></script>
+
 </body>
 </html>

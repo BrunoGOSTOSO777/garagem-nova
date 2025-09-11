@@ -1,8 +1,20 @@
 /* Estilos Gerais */
+:root {
+    --bg-dark: #1a1a2e;
+    --bg-panel: #16213e;
+    --primary: #e94560;
+    --secondary: #0f3460;
+    --text-light: #e0e0e0;
+    --border-color: #537895;
+    --success: #28a745;
+    --danger: #dc3545;
+    --warning: #ffc107;
+}
+
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    background-color: #1a1a2e;
-    color: #e0e0e0;
+    background-color: var(--bg-dark);
+    color: var(--text-light);
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -11,23 +23,24 @@ body {
     box-sizing: border-box;
 }
 
+/* Layout Principal */
 .main-container {
     display: flex;
-    flex-wrap: wrap; /* Permite que as colunas quebrem em telas menores */
+    flex-wrap: wrap;
     gap: 2rem;
     width: 100%;
-    max-width: 1200px;
+    max-width: 1300px;
 }
 
 .garage-container, .maintenance-container {
-    background-color: #16213e;
-    border: 1px solid #0f3460;
-    padding: 1.5rem;
+    background-color: var(--bg-panel);
+    border: 1px solid var(--secondary);
+    padding: 1.5rem 2rem;
     border-radius: 15px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
     text-align: center;
-    flex: 1; /* Ocupa espaço igualmente */
-    min-width: 400px; /* Largura mínima antes de quebrar a linha */
+    flex: 1;
+    min-width: 450px;
 }
 
 .maintenance-container {
@@ -36,14 +49,11 @@ body {
     gap: 1.5rem;
 }
 
-h1, h2, h3, h4 {
-    color: #e94560;
-    margin-top: 0;
-}
+header { margin-bottom: 1.5rem; }
+h1, h2, h3, h4 { color: var(--primary); margin-top: 0; }
 h4 {
-    margin-bottom: 0.5rem;
-    margin-top: 1.5rem;
-    border-top: 1px solid #0f3460;
+    margin: 1.5rem 0 0.5rem 0;
+    border-top: 1px solid var(--secondary);
     padding-top: 1rem;
 }
 
@@ -55,33 +65,22 @@ h4 {
     text-align: left;
 }
 
-/* Seletor de Veículo */
-.vehicle-selector {
-    margin-bottom: 2rem;
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-}
-
+/* Navegação e Seletores */
+.vehicle-selector { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
 .selector-btn {
-    background: #0f3460;
+    background: var(--secondary);
     border: 2px solid transparent;
-    color: #e0e0e0;
+    color: var(--text-light);
     padding: 10px 15px;
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
     transition: all 0.3s ease;
 }
-
-.selector-btn:hover {
-    background-color: #537895;
-}
-
+.selector-btn:hover { background-color: var(--border-color); }
 .selector-btn.active {
-    background-color: #e94560;
-    border-color: #e94560;
+    background-color: var(--primary);
+    border-color: var(--primary);
     box-shadow: 0 0 15px rgba(233, 69, 96, 0.5);
 }
 
@@ -93,33 +92,23 @@ h4 {
     object-fit: cover;
     border-radius: 10px;
     margin-bottom: 1.5rem;
-    background-color: #0f3460;
+    background-color: var(--secondary);
+    border: 2px solid var(--secondary);
 }
 
-.status-indicator-container, .speedometer-container {
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-}
+.status-indicator-container { font-size: 1.2rem; }
+#status-indicator { font-size: 1.5rem; vertical-align: middle; transition: color 0.5s; }
+.status-on { color: var(--success); text-shadow: 0 0 10px var(--success); }
+.status-off { color: var(--danger); text-shadow: 0 0 10px var(--danger); }
 
-#status-indicator {
-    transition: color 0.5s;
-    font-size: 1.5rem;
-    vertical-align: middle;
-}
-.status-on { color: #28a745; text-shadow: 0 0 10px #28a745; }
-.status-off { color: #dc3545; text-shadow: 0 0 10px #dc3545; }
-
-.speedometer-container progress {
-    width: 60%;
-    height: 20px;
-    vertical-align: middle;
-}
+.speedometer-container { margin: 1rem 0; }
+.speedometer-container progress { width: 60%; height: 20px; vertical-align: middle; }
 
 .info-box {
     background-color: rgba(15, 52, 96, 0.5);
-    border-left: 4px solid #e94560;
+    border-left: 4px solid var(--primary);
     padding: 1rem;
-    margin-bottom: 2rem;
+    margin: 1.5rem 0;
     border-radius: 5px;
     text-align: left;
     white-space: pre-wrap;
@@ -129,8 +118,8 @@ h4 {
 /* Controles e Formulários */
 .controls-section { margin-top: 1rem; }
 .button-group { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; }
-.button-group button, button[type="submit"] {
-    background-color: #537895;
+button {
+    background-color: var(--border-color);
     border: none;
     color: white;
     padding: 12px 18px;
@@ -139,52 +128,20 @@ h4 {
     font-size: 1rem;
     transition: all 0.2s ease;
 }
-.button-group button:hover, button[type="submit"]:hover { opacity: 0.8; }
-.button-group button:disabled, button[type="submit"]:disabled { background-color: #333; cursor: not-allowed; opacity: 0.7; }
+button:hover { opacity: 0.85; }
+button:active { transform: scale(0.97); }
+button:disabled { background-color: #333; cursor: not-allowed; opacity: 0.7; }
 
-.form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-}
-.form-grid input, .form-grid select, .form-grid textarea {
-    background-color: #0f3460;
-    border: 1px solid #537895;
-    color: #e0e0e0;
+form button[type="submit"] { background-color: var(--primary); width: 100%; }
+.form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+form input, form select, form textarea {
+    background-color: var(--secondary);
+    border: 1px solid var(--border-color);
+    color: var(--text-light);
     padding: 10px;
     border-radius: 5px;
     width: 100%;
     box-sizing: border-box;
 }
-.form-grid textarea {
-    grid-column: 1 / -1; /* Ocupa as duas colunas */
-    resize: vertical;
-}
-.form-grid button {
-    grid-column: 1 / -1;
-    background-color: #e94560;
-}
-
-/* Seção de Manutenção */
-#maintenance-history, #notifications-list {
-    max-height: 200px;
-    overflow-y: auto;
-    padding-right: 10px;
-    border-left: 3px solid #0f3460;
-    padding-left: 15px;
-    margin-bottom: 1.5rem;
-}
-.maintenance-item, .notification-item {
-    background-color: #0f3460;
-    padding: 10px;
-    border-radius: 5px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-.maintenance-item.future {
-    border-left: 3px solid #ffc107; /* Amarelo para futuro */
-}
-.maintenance-item.past {
-    border-left: 3px solid #28a745; /* Verde para passado */
-    opacity: 0.8;
-}
+form textarea { grid-column: 1 / -1; resize: vertical; }
+form *:first-child { grid-column: 1 / -1; }
