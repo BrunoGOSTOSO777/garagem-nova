@@ -11,7 +11,8 @@ export default class CarroEsportivo extends Veiculo {
      * @param {string} modelo - O modelo do carro esportivo.
      */
     constructor(modelo) {
-        super(modelo, 'LaFerrari');
+        // CORREÇÃO: Usar o nome da classe 'CarroEsportivo' para que a imagem seja encontrada corretamente.
+        super(modelo, 'CarroEsportivo'); 
         this.maxVelocidade = 360;
         this.turbo = false;
     }

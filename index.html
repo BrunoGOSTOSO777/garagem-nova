@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missão Final - Garagem Inteligente Documentada</title>
+    <title>Missão Final - Garagem Inteligente com API</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -57,22 +57,61 @@
                 <h2>Gerenciamento da Frota</h2>
             </header>
 
-            <div class="card">
-                <h3>Adicionar Novo Veículo</h3>
-                <form id="add-vehicle-form" class="form-grid">
-                    <select id="vehicle-type" required>
-                        <option value="" disabled selected>Selecione o Tipo</option>
-                        <option value="Carro">Carro</option>
-                        <option value="CarroEsportivo">Carro Esportivo</option>
-                        <option value="Caminhao">Caminhão</option>
-                    </select>
-                    <input type="text" id="vehicle-model" placeholder="Modelo (ex: Onix)" required>
-                    <button type="submit">Adicionar à Garagem</button>
-                </form>
-            </div>
+            <!-- CARD ATUALIZADO COM TODOS OS DESAFIOS -->
+    <div class="card">
+        <h3>Planejador de Viagem Interativo</h3>
+    <div class="weather-form">
+        <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
+        <button id="verificar-clima-btn">Verificar Clima</button>
+    </div>
+
+    <!-- Controles de Interatividade -->
+    <div id="weather-controls">
+        <!-- Desafio A: Filtro de Dias -->
+        <div class="control-group">
+            <label>Mostrar:</label>
+            <button class="filter-btn" data-days="1">1 Dia</button>
+            <button class="filter-btn" data-days="3">3 Dias</button>
+            <button class="filter-btn active" data-days="5">5 Dias</button>
+        </div>
+        <!-- Desafio C: Alternador de Unidades -->
+        <div class="control-group">
+            <label class="unit-switch">
+                <span>°C</span>
+                <input type="checkbox" id="unit-toggle">
+                <span class="slider"></span>
+                <span>°F</span>
+            </label>
+        </div>
+        <!-- Desafio B: Destaques -->
+        <div class="control-group highlight-group">
+            <label><input type="checkbox" data-highlight="rain"> Destacar Chuva</label>
+            <label><input type="checkbox" data-highlight="cold"> Destacar Frio (&lt;10°C)</label>
+            <label><input type="checkbox" data-highlight="hot"> Destacar Calor (&gt;30°C)</label>
+        </div>
+    </div>
+
+    <!-- Div para exibir os resultados -->
+    <div id="previsao-detalhada-resultado">
+        <!-- Os cards da previsão serão inseridos aqui -->
+    </div>
+    </div>
             
+            <!-- NOVO: Card do Planejador de Viagem com Previsão do Tempo -->
+            <div class="card">
+                <h3>Planejador de Viagem</h3>
+                <p>Verifique o clima no seu destino!</p>
+                <div class="weather-form">
+                    <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
+                    <button id="verificar-clima-btn">Verificar Clima</button>
+                </div>
+                <!-- Div para exibir os resultados da previsão -->
+                <div id="previsao-tempo-resultado"></div>
+            </div>
+
             <div class="card">
                 <h3 id="maintenance-title">Manutenção do Veículo</h3>
+                <!-- ... (resto do card de manutenção) ... -->
                 <div id="maintenance-history">
                     <p>Selecione um veículo para ver o histórico.</p>
                 </div>
@@ -86,21 +125,10 @@
                     <button type="submit" id="maint-submit-btn" disabled>Agendar Serviço</button>
                 </form>
             </div>
-
-            <div class="card">
-                <h3>Lembretes (Próximos 7 dias)</h3>
-                <div id="notifications-list">
-                    <p>Nenhum agendamento próximo.</p>
-                </div>
-            </div>
+            
         </aside>
     </main>
-
-    <!--
-      MUDANÇA IMPORTANTE:
-      - Usamos type="module" para habilitar a sintaxe de import/export do ES6.
-      - Apontamos para o 'main.js', que agora é o ponto de entrada da nossa aplicação.
-    -->
+    
     <script type="module" src="main.js"></script>
 
 </body>
