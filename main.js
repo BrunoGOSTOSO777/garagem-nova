@@ -4,53 +4,63 @@ import Carro from './classes/Carro.js';
 import CarroEsportivo from './classes/CarroEsportivo.js';
 import Caminhao from './classes/Caminhao.js';
 
-// --- INICIALIZAÇÃO E LÓGICA DA UI ---
+// --- INICIALIZAÇÃO DA GARAGEM ---
 const garagem = new Garagem();
 
-document.addEventListener('DOMContentLoaded', () => {
-    garagem.carregar();
-    configurarEventListeners();
-    atualizarUICompleta();
-});
-
-
 // ========================================================================
-// --- SEÇÃO DA API DE PREVISÃO DO TEMPO INTERATIVA ---
+// --- SEÇÃO DA API - AGORA CHAMANDO NOSSO BACKEND ---
 // ========================================================================
 
-// !!!!!   COLE SUA CHAVE DE API AQUI (SE AINDA NÃO FEZ)   !!!!!
-const OPENWEATHER_API_KEY = "SUA_CHAVE_DE_API_VAI_AQUI"; 
-// !!!!!   AVISO: Em um projeto real, esta chave nunca deve ficar no código.
+// A CHAVE DE API FOI REMOVIDA DAQUI! Agora está segura no backend.
 
-/** Objeto para manter o estado atual das preferências e dados do clima. */
+/**
+ * Objeto para manter o estado atual das preferências e dados do clima.
+ * Isso evita chamadas desnecessárias à API.
+ */
 const weatherState = {
     cidade: null,
-    unidade: localStorage.getItem('weatherUnit') || 'metric',
+    unidade: localStorage.getItem('weatherUnit') || 'metric', // 'metric' para Celsius, 'imperial' para Fahrenheit
     diasParaMostrar: 5,
-    destaques: { rain: false, cold: false, hot: false },
-    dadosCompletos: [],
+    destaques: {
+        rain: false,
+        cold: false,
+        hot: false,
+    },
+    dadosCompletos: [], // Armazena os dados processados da API
 };
 
-async function getCoordenadas(cidade) {
-    if (OPENWEATHER_API_KEY === "SUA_CHAVE_DE_API_VAI_AQUI") throw new Error("Chave de API não configurada no main.js.");
-    const url = `https://api.openweathermap.org/geo/1.0/direct?q=${cidade}&limit=1&appid=${OPENWEATHER_API_KEY}`;
-    const response = await fetch(url);
-    if (!response.ok) throw new Error("Erro ao buscar coordenadas.");
-    const data = await response.json();
-    if (data.length === 0) throw new Error("Cidade não encontrada.");
-    return { lat: data[0].lat, lon: data[0].lon };
-}
+/**
+ * Busca a previsão de 5 dias CHAMANDO NOSSO PRÓPRIO BACKEND.
+ * @param {string} cidade O nome da cidade.
+ * @param {string} unidade 'metric' para Celsius ou 'imperial' para Fahrenheit.
+ * @returns {Promise<object>} Os dados brutos da API de previsão.
+ */
+async function getPrevisaoDoBackend(cidade, unidade) {
+    // !! MUDANÇA CRÍTICA !!
+    // Esta variável controla para onde o frontend aponta.
+    // Para testar localmente, use: 'http://localhost:3001'
+    // Após o deploy, substitua pela sua URL pública do Render.com.
+    const backendBaseUrl = 'http://localhost:3001'; // <-- ALTERE AQUI APÓS O DEPLOY!
 
-async function getPrevisao5Dias(lat, lon, unidade) {
-    const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${OPENWEATHER_API_KEY}&units=${unidade}&lang=pt_br`;
-    const response = await fetch(url);
+    const backendUrl = `${backendBaseUrl}/api/previsao/${cidade}?unidade=${unidade}`;
+
+    const response = await fetch(backendUrl);
+
+    // Se a resposta não for OK, pega a mensagem de erro que nosso backend enviou
     if (!response.ok) {
-        if (response.status === 401) throw new Error("Chave de API inválida ou não ativada.");
-        throw new Error("Erro ao buscar previsão do tempo.");
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Erro ${response.status} ao contatar o backend.`);
     }
+
     return await response.json();
 }
 
+/**
+ * Processa os dados brutos da API de previsão (retornados pelo nosso backend)
+ * e os agrupa por dia.
+ * @param {object} dadosAPI Dados brutos da API de forecast.
+ * @returns {Array<object>} Um array de objetos, cada um representando um dia.
+ */
 function processarDadosForecast(dadosAPI) {
     const previsoesPorDia = {};
     for (const previsao of dadosAPI.list) {
@@ -79,6 +89,9 @@ function processarDadosForecast(dadosAPI) {
     });
 }
 
+/**
+ * Renderiza os cards de previsão na tela com base no estado atual.
+ */
 function exibirPrevisaoDetalhada() {
     const container = document.getElementById('previsao-detalhada-resultado');
     if (weatherState.dadosCompletos.length === 0) {
@@ -87,20 +100,17 @@ function exibirPrevisaoDetalhada() {
     }
     const dadosFiltrados = weatherState.dadosCompletos.slice(0, weatherState.diasParaMostrar);
     const simboloTemp = weatherState.unidade === 'metric' ? '°C' : '°F';
-
     container.innerHTML = dadosFiltrados.map(dia => {
         const classesDestaque = [];
         if (weatherState.destaques.rain && dia.vaiChover) classesDestaque.push('dia-chuvoso');
         if (weatherState.destaques.cold && dia.temp_min < 10 && weatherState.unidade === 'metric') classesDestaque.push('temp-fria');
         if (weatherState.destaques.hot && dia.temp_max > 30 && weatherState.unidade === 'metric') classesDestaque.push('temp-quente');
-
         const detalhesHtml = dia.detalhesPorHora.map(d => `
             <div class="hour-detail">
                 <strong>${d.hora}</strong>
                 <img src="https://openweathermap.org/img/wn/${d.icon}.png" alt="">
                 <span>${d.temp.toFixed(0)}${simboloTemp}</span>
             </div>`).join('');
-
         return `
             <div class="forecast-day ${classesDestaque.join(' ')}">
                 <div class="summary">
@@ -117,6 +127,9 @@ function exibirPrevisaoDetalhada() {
     adicionarListenersAosCards();
 }
 
+/**
+ * Adiciona o evento de clique para expandir/recolher os detalhes de cada card de previsão.
+ */
 function adicionarListenersAosCards() {
     document.querySelectorAll('.forecast-day').forEach(card => {
         card.addEventListener('click', () => {
@@ -126,6 +139,9 @@ function adicionarListenersAosCards() {
     });
 }
 
+/**
+ * Função principal que orquestra a busca e exibição do clima.
+ */
 async function handleVerificarClima() {
     const cidadeInput = document.getElementById('destino-viagem');
     weatherState.cidade = cidadeInput.value.trim();
@@ -133,8 +149,7 @@ async function handleVerificarClima() {
     if (!weatherState.cidade) return alert("Por favor, digite uma cidade.");
     resultadoDiv.innerHTML = '<p>Buscando previsão...</p>';
     try {
-        const { lat, lon } = await getCoordenadas(weatherState.cidade);
-        const dadosAPI = await getPrevisao5Dias(lat, lon, weatherState.unidade);
+        const dadosAPI = await getPrevisaoDoBackend(weatherState.cidade, weatherState.unidade);
         weatherState.dadosCompletos = processarDadosForecast(dadosAPI);
         exibirPrevisaoDetalhada();
     } catch (error) {
@@ -142,31 +157,26 @@ async function handleVerificarClima() {
     }
 }
 
-
 /**
  * Configura todos os event listeners da aplicação.
  */
 function configurarEventListeners() {
-    // Formulário para adicionar veículo
     document.getElementById('add-vehicle-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const tipo = document.getElementById('vehicle-type').value;
         const modelo = document.getElementById('vehicle-model').value.trim();
         if (!tipo || !modelo) return;
-
         let novoVeiculo;
         switch(tipo) {
             case 'Carro': novoVeiculo = new Carro(modelo); break;
             case 'CarroEsportivo': novoVeiculo = new CarroEsportivo(modelo); break;
             case 'Caminhao': novoVeiculo = new Caminhao(modelo); break;
         }
-        
         garagem.adicionarVeiculo(novoVeiculo);
         e.target.reset();
         atualizarUICompleta();
     });
 
-    // Formulário de manutenção (sem alterações)
     document.getElementById('maintenance-form').addEventListener('submit', (e) => {
         e.preventDefault();
         if (!garagem.veiculoAtual) return;
@@ -181,68 +191,35 @@ function configurarEventListeners() {
         e.target.reset();
     });
 
-    // --- NOVO EVENT LISTENER PARA O BOTÃO DO CLIMA ---
-    
     // --- LISTENERS PARA O PLANEJADOR DE VIAGEM INTERATIVO ---
+    document.getElementById('verificar-clima-btn').addEventListener('click', handleVerificarClima);
 
-// Listener principal do botão de verificar clima
-document.getElementById('verificar-clima-btn').addEventListener('click', handleVerificarClima);
-
-// Listeners dos filtros de dias (Desafio A)
-document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        document.querySelector('.filter-btn.active').classList.remove('active');
-        e.target.classList.add('active');
-        weatherState.diasParaMostrar = parseInt(e.target.dataset.days);
-        exibirPrevisaoDetalhada(); // Apenas re-renderiza, sem nova chamada de API
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            document.querySelector('.filter-btn.active').classList.remove('active');
+            e.target.classList.add('active');
+            weatherState.diasParaMostrar = parseInt(e.target.dataset.days);
+            exibirPrevisaoDetalhada();
+        });
     });
-});
 
-// Listeners dos checkboxes de destaque (Desafio B)
-document.querySelectorAll('#weather-controls input[type="checkbox"][data-highlight]').forEach(box => {
-    box.addEventListener('click', (e) => {
-        weatherState.destaques[e.target.dataset.highlight] = e.target.checked;
-        exibirPrevisaoDetalhada(); // Apenas re-renderiza
+    document.querySelectorAll('#weather-controls input[type="checkbox"][data-highlight]').forEach(box => {
+        box.addEventListener('click', (e) => {
+            weatherState.destaques[e.target.dataset.highlight] = e.target.checked;
+            exibirPrevisaoDetalhada();
+        });
     });
-});
 
-// Listener do toggle de unidades (Desafio C)
-const unitToggle = document.getElementById('unit-toggle');
-unitToggle.checked = weatherState.unidade === 'imperial'; // Sincroniza o visual com o estado
-unitToggle.addEventListener('change', (e) => {
-    weatherState.unidade = e.target.checked ? 'imperial' : 'metric';
-    localStorage.setItem('weatherUnit', weatherState.unidade); // Salva a preferência
-    if (weatherState.cidade) {
-        // Se já tiver uma cidade, busca os dados novamente com a nova unidade
-        handleVerificarClima();
-    }
-});
-
-        // Exibe mensagem de "carregando"
-        resultadoDiv.className = 'info';
-        resultadoDiv.innerHTML = `<p>Buscando previsão para ${cidade}...</p>`;
-        
-        try {
-            const previsao = await buscarPrevisaoTempo(cidade);
-            
-            // Exibe os resultados com sucesso
-            resultadoDiv.className = 'sucesso';
-            resultadoDiv.innerHTML = `
-                <img src="https://openweathermap.org/img/wn/${previsao.icone}@2x.png" alt="Ícone do tempo">
-                <div>
-                    <strong>Clima em ${previsao.cidade}, ${previsao.pais}:</strong>
-                    <p>${previsao.descricao.charAt(0).toUpperCase() + previsao.descricao.slice(1)}</p>
-                    <p>Temperatura: ${previsao.temperatura.toFixed(1)}°C</p>
-                </div>
-            `;
-        } catch (error) {
-            // Exibe a mensagem de erro
-            resultadoDiv.className = 'erro';
-            resultadoDiv.innerHTML = `<p><strong>Erro:</strong> ${error.message}</p>`;
+    const unitToggle = document.getElementById('unit-toggle');
+    unitToggle.checked = weatherState.unidade === 'imperial';
+    unitToggle.addEventListener('change', (e) => {
+        weatherState.unidade = e.target.checked ? 'imperial' : 'metric';
+        localStorage.setItem('weatherUnit', weatherState.unidade);
+        if (weatherState.cidade) {
+            handleVerificarClima();
         }
-    };
+    });
 
-    // Delegação de eventos para botões de ação e seleção (sem alterações)
     document.querySelector('.main-container').addEventListener('click', (e) => {
         const target = e.target;
         if (target.matches('.selector-btn')) {
@@ -259,20 +236,18 @@ unitToggle.addEventListener('change', (e) => {
     });
 }
 
-
 /**
  * Função central que atualiza toda a interface do usuário.
  */
 function atualizarUICompleta() {
-    // O resto desta seção não precisa de alterações
     const veiculo = garagem.veiculoAtual;
     atualizarPainelVeiculo(veiculo);
     atualizarSeletores(veiculo);
     atualizarControlesEspecificos(veiculo);
     atualizarPainelManutencao(veiculo);
-    // ... (as outras funções de UI continuam as mesmas)
 }
 
+// --- FUNÇÕES DE ATUALIZAÇÃO DA UI (GARAGEM) ---
 function atualizarPainelVeiculo(veiculo) {
     const infoBox = document.getElementById('vehicle-info');
     const img = document.getElementById('vehicle-image');
@@ -332,12 +307,9 @@ function atualizarPainelManutencao(veiculo) {
         if (veiculo.historicoManutencao.length === 0) {
             historyDiv.innerHTML = '<p>Nenhum serviço registrado.</p>';
         } else {
-            const hoje = new Date().setHours(0, 0, 0, 0);
             veiculo.historicoManutencao.forEach(maint => {
                 const item = document.createElement('div');
                 item.className = 'maintenance-item';
-                const dataManutencao = new Date(maint.data + 'T00:00:00').setHours(0, 0, 0, 0);
-                item.classList.add(dataManutencao >= hoje ? 'future' : 'past');
                 item.textContent = maint.formatar();
                 if (maint.descricao) item.title = `Descrição: ${maint.descricao}`;
                 historyDiv.appendChild(item);
@@ -349,3 +321,10 @@ function atualizarPainelManutencao(veiculo) {
         submitBtn.disabled = true;
     }
 }
+
+// INICIALIZAÇÃO DA APLICAÇÃO
+document.addEventListener('DOMContentLoaded', () => {
+    garagem.carregar();
+    configurarEventListeners();
+    atualizarUICompleta();
+});

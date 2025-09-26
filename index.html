@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Missão Final - Garagem Inteligente com API</title>
+    <title>Garagem Inteligente - Previsão Interativa</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,28 +13,21 @@
         <section class="garage-container">
             <header>
                 <h1>Garagem Inteligente</h1>
-                <nav class="vehicle-selector">
-                    <!-- Botões dos veículos serão gerados dinamicamente aqui -->
-                </nav>
+                <nav class="vehicle-selector"></nav>
             </header>
-
             <div class="vehicle-panel">
                 <img id="vehicle-image" src="imagens/placeholder.png" alt="Imagem do Veículo Selecionado">
-                
                 <div class="status-indicator-container">
                     Status: <span id="status-indicator" class="status-off">●</span> <span id="status-text">Desligado</span>
                 </div>
-
                 <div class="speedometer-container">
                     <label for="speed-bar">Velocidade:</label>
                     <progress id="speed-bar" value="0" max="300"></progress>
                     <span id="speed-text">0 km/h</span>
                 </div>
-
                 <div id="vehicle-info" class="info-box">
-                    <p>Bem-vindo! Adicione um veículo no painel à direita para começar.</p>
+                    <p>Adicione um veículo para começar.</p>
                 </div>
-
                 <div class="controls-section">
                     <h3>Controles Gerais</h3>
                     <div class="button-group general-controls">
@@ -44,78 +37,70 @@
                         <button data-action="frear">Frear</button>
                     </div>
                 </div>
-
-                <div id="specific-controls" class="controls-section">
-                    <!-- Controles específicos (Turbo, Carga) aparecerão aqui -->
-                </div>
+                <div id="specific-controls" class="controls-section"></div>
             </div>
         </section>
 
-        <!-- Coluna de Gerenciamento e Manutenção -->
+        <!-- Coluna de Gerenciamento -->
         <aside class="maintenance-container">
             <header>
                 <h2>Gerenciamento da Frota</h2>
             </header>
 
-            <!-- CARD ATUALIZADO COM TODOS OS DESAFIOS -->
-    <div class="card">
-        <h3>Planejador de Viagem Interativo</h3>
-    <div class="weather-form">
-        <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
-        <button id="verificar-clima-btn">Verificar Clima</button>
-    </div>
-
-    <!-- Controles de Interatividade -->
-    <div id="weather-controls">
-        <!-- Desafio A: Filtro de Dias -->
-        <div class="control-group">
-            <label>Mostrar:</label>
-            <button class="filter-btn" data-days="1">1 Dia</button>
-            <button class="filter-btn" data-days="3">3 Dias</button>
-            <button class="filter-btn active" data-days="5">5 Dias</button>
-        </div>
-        <!-- Desafio C: Alternador de Unidades -->
-        <div class="control-group">
-            <label class="unit-switch">
-                <span>°C</span>
-                <input type="checkbox" id="unit-toggle">
-                <span class="slider"></span>
-                <span>°F</span>
-            </label>
-        </div>
-        <!-- Desafio B: Destaques -->
-        <div class="control-group highlight-group">
-            <label><input type="checkbox" data-highlight="rain"> Destacar Chuva</label>
-            <label><input type="checkbox" data-highlight="cold"> Destacar Frio (&lt;10°C)</label>
-            <label><input type="checkbox" data-highlight="hot"> Destacar Calor (&gt;30°C)</label>
-        </div>
-    </div>
-
-    <!-- Div para exibir os resultados -->
-    <div id="previsao-detalhada-resultado">
-        <!-- Os cards da previsão serão inseridos aqui -->
-    </div>
-    </div>
-            
-            <!-- NOVO: Card do Planejador de Viagem com Previsão do Tempo -->
             <div class="card">
-                <h3>Planejador de Viagem</h3>
-                <p>Verifique o clima no seu destino!</p>
+                <h3>Adicionar Novo Veículo</h3>
+                <form id="add-vehicle-form" class="form-grid">
+                    <select id="vehicle-type" required>
+                        <option value="" disabled selected>Selecione o Tipo</option>
+                        <option value="Carro">Carro</option>
+                        <option value="CarroEsportivo">Carro Esportivo</option>
+                        <option value="Caminhao">Caminhão</option>
+                    </select>
+                    <input type="text" id="vehicle-model" placeholder="Modelo (ex: Onix)" required>
+                    <button type="submit">Adicionar à Garagem</button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h3>Planejador de Viagem Interativo</h3>
                 <div class="weather-form">
                     <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
                     <button id="verificar-clima-btn">Verificar Clima</button>
                 </div>
-                <!-- Div para exibir os resultados da previsão -->
-                <div id="previsao-tempo-resultado"></div>
+
+                <!-- Controles de Interatividade -->
+                <div id="weather-controls">
+                    <div class="control-group">
+                        <label>Mostrar:</label>
+                        <button class="filter-btn" data-days="1">1 Dia</button>
+                        <button class="filter-btn" data-days="3">3 Dias</button>
+                        <button class="filter-btn active" data-days="5">5 Dias</button>
+                    </div>
+                    <div class="control-group">
+                        <label class="unit-switch">
+                            <span>°C</span>
+                            <input type="checkbox" id="unit-toggle">
+                            <span class="slider"></span>
+                            <span>°F</span>
+                        </label>
+                    </div>
+                    <div class="control-group highlight-group">
+                        <label><input type="checkbox" data-highlight="rain"> Destacar Chuva</label>
+                        <label><input type="checkbox" data-highlight="cold"> Destacar Frio (&lt;10°C)</label>
+                        <label><input type="checkbox" data-highlight="hot"> Destacar Calor (&gt;30°C)</label>
+                    </div>
+                </div>
+
+                <div id="previsao-detalhada-resultado">
+                    <!-- Os cards da previsão serão inseridos aqui -->
+                </div>
             </div>
 
             <div class="card">
                 <h3 id="maintenance-title">Manutenção do Veículo</h3>
-                <!-- ... (resto do card de manutenção) ... -->
                 <div id="maintenance-history">
                     <p>Selecione um veículo para ver o histórico.</p>
                 </div>
-
                 <h4>Agendar Novo Serviço</h4>
                 <form id="maintenance-form">
                     <input type="date" id="maint-date" required>
