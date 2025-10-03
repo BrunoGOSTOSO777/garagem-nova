@@ -1,58 +1,67 @@
-GaragemFinal/
-├── imagens/
-│   ├── carro.png
-│   ├── carroesportivo.png
-│   ├── caminhao.png
-│   └── placeholder.png
-├── index.html
-├── style.css
-└── script.js
+# Garagem Inteligente - Projeto Full-Stack
 
-# Garagem Inteligente e Manutenção - Versão Final
+Este projeto é uma aplicação web completa para gerenciamento de uma frota de veículos, agora com integração a um backend Node.js/Express para funcionalidades online, como a previsão do tempo.
 
-Este projeto é uma aplicação web completa para gerenciamento de uma frota de veículos, desenvolvida como consolidação de aprendizados em HTML, CSS e JavaScript Orientado a Objetos.
+## ✨ Funcionalidades
 
-A aplicação permite ao usuário adicionar diferentes tipos de veículos, interagir com eles (ligar, acelerar, usar habilidades especiais) e gerenciar um histórico de manutenção completo para cada um, com todos os dados persistidos no navegador.
+*   **Frontend (Client-Side)**:
+    *   **Gerenciamento de Frota**: Adição de Carros, Carros Esportivos e Caminhões.
+    *   **Interação com Veículos**: Controles de Ligar, Acelerar, Frear e habilidades especiais.
+    *   **Sistema de Manutenção**: Agendamento e visualização de histórico de serviços.
+    *   **Persistência de Dados**: O estado da garagem é salvo no **LocalStorage** do navegador.
+    *   **Planejador de Viagem Interativo**: Consulta a previsão do tempo de qualquer cidade do mundo.
 
-## Funcionalidades Implementadas
+*   **Backend (Server-Side)**:
+    *   **API Proxy Segura**: Um endpoint (`/api/previsao/:cidade`) que busca dados da API OpenWeatherMap.
+    *   **Proteção da API Key**: A chave da API da OpenWeatherMap é mantida em segurança no servidor, nunca exposta no frontend.
+    *   **CORS Habilitado**: Permite que o frontend (hospedado em qualquer lugar) acesse a API do backend.
 
-*   **Interface Unificada**: Todas as funcionalidades são acessíveis a partir de uma única tela coesa, com um layout de duas colunas para interação e gerenciamento.
-*   **Gerenciamento de Frota**:
-    *   Adição de diferentes tipos de veículos (Carro, Carro Esportivo, Caminhão).
-    *   Navegação intuitiva para selecionar o veículo ativo.
-*   **Interação com Veículos**:
-    *   Controles básicos: Ligar, Desligar, Acelerar e Frear.
-    *   Controles específicos baseados no tipo de veículo (ex: Ativar/Desativar Turbo para Carros Esportivos).
-    *   Feedback visual em tempo real (indicador de status, velocímetro).
-*   **Sistema de Manutenção e Agendamento**:
-    *   Agendamento de novos serviços de manutenção com data, tipo, custo e descrição.
-    *   Visualização do histórico de manutenções, separado por serviços passados e futuros.
-    *   Painel de "Lembretes" que exibe automaticamente os serviços agendados para os próximos 7 dias.
-*   **Persistência de Dados**:
-    *   Todo o estado da garagem (veículos e seus históricos de manutenção) é salvo automaticamente no **LocalStorage** do navegador.
-    *   Os dados são recarregados ao reabrir a aplicação, permitindo que o usuário continue de onde parou.
-*   **Tratamento de Erros e Usabilidade**:
-    *   A interface previne ações inválidas (ex: desligar um carro em movimento).
-    *   Feedback claro é fornecido ao usuário através de alertas.
-    *   Formulários possuem validação para garantir a integridade dos dados.
+## 🚀 Publicação (Deploy)
 
-## Como Executar
+A aplicação está dividida em duas partes, publicadas em plataformas diferentes:
+
+*   **Frontend**: Publicado no Vercel/Netlify/GitHub Pages.
+    *   **Link da Aplicação**: `[SUA-URL-DO-FRONTEND-AQUI]`
+
+*   **Backend**: Publicado no Render.com.
+    *   **Link da API**: `[SUA-URL-DO-BACKEND-AQUI]`
+
+## 🛠️ Como Executar Localmente
+
+Você precisará ter o [Node.js](https://nodejs.org/) instalado.
 
 1.  **Clone o repositório**:
     ```bash
     git clone [URL-DO-SEU-REPOSITORIO]
+    cd [NOME-DA-PASTA-DO-PROJETO]
     ```
-2.  **Estrutura de Arquivos**: Certifique-se de que a pasta `imagens` contém os arquivos `carro.png`, `carroesportivo.png`, `caminhao.png` e `placeholder.png`.
-3.  **Abra no Navegador**: Abra o arquivo `index.html` em qualquer navegador web moderno (Chrome, Firefox, etc.).
 
-Não é necessário nenhum servidor ou processo de compilação. A aplicação é totalmente client-side.
+2.  **Configure o Backend**:
+    *   Navegue até a pasta do projeto no terminal.
+    *   Crie um arquivo chamado `.env` na raiz do projeto.
+    *   Dentro do `.env`, adicione sua chave da API da OpenWeatherMap:
+        ```
+        OPENWEATHER_API_KEY=sua_chave_secreta_aqui
+        ```
+    *   Instale as dependências do backend:
+        ```bash
+        npm install
+        ```
+    *   Inicie o servidor backend:
+        ```bash
+        npm start
+        ```
+        O servidor estará rodando em `http://localhost:3001`.
 
-## Tecnologias Utilizadas
+3.  **Execute o Frontend**:
+    *   Verifique se a variável `backendBaseUrl` no arquivo `main.js` está apontando para `http://localhost:3001`.
+    *   Abra o arquivo `index.html` em seu navegador.
 
-*   **HTML5**: Estrutura semântica da aplicação.
-*   **CSS3**: Estilização, layout responsivo (Flexbox) e tema visual.
-*   **JavaScript (ES6+)**:
-    *   **Programação Orientada a Objetos (OOP)**: Uso de Classes para modelar Veículos e Manutenções.
-    *   **Herança e Polimorfismo**.
-    *   Manipulação do DOM para criar uma interface dinâmica.
-    *   Uso da API do **LocalStorage** para persistência de dados.
+A aplicação agora deve funcionar completamente no seu computador.
+
+## 💻 Tecnologias Utilizadas
+
+*   **Frontend**: HTML5, CSS3, JavaScript (ES6+ com Módulos e Classes).
+*   **Backend**: Node.js, Express.js, Axios, Dotenv.
+*   **Plataformas de Deploy**: Render.com (Backend), Vercel/Netlify (Frontend).
+*   **APIs Externas**: OpenWeatherMap API.

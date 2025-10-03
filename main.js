@@ -37,10 +37,9 @@ const weatherState = {
  */
 async function getPrevisaoDoBackend(cidade, unidade) {
     // !! MUDANÇA CRÍTICA !!
-    // Esta variável controla para onde o frontend aponta.
-    // Para testar localmente, use: 'http://localhost:3001'
-    // Após o deploy, substitua pela sua URL pública do Render.com.
-    const backendBaseUrl = 'http://localhost:3001'; // <-- ALTERE AQUI APÓS O DEPLOY!
+    // A URL foi atualizada para apontar para o servidor no Render.com.
+    // Lembre-se de substituir pela URL do SEU serviço após fazer o deploy.
+    const backendBaseUrl = 'https://garagem-nova-a.onrender.com'; // <-- SUBSTITUA PELA SUA URL PÚBLICA DO RENDER!
 
     const backendUrl = `${backendBaseUrl}/api/previsao/${cidade}?unidade=${unidade}`;
 
