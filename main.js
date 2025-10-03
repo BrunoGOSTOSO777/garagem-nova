@@ -4,62 +4,26 @@ import Carro from './classes/Carro.js';
 import CarroEsportivo from './classes/CarroEsportivo.js';
 import Caminhao from './classes/Caminhao.js';
 
-// --- INICIALIZAÇÃO DA GARAGEM ---
 const garagem = new Garagem();
+// Define a URL base do nosso backend. Mude para a URL do Render após o deploy.
+const backendBaseUrl = 'http://localhost:3001';
 
 // ========================================================================
-// --- SEÇÃO DA API - AGORA CHAMANDO NOSSO BACKEND ---
+// --- SEÇÃO DA API - PREVISÃO DO TEMPO ---
 // ========================================================================
 
-// A CHAVE DE API FOI REMOVIDA DAQUI! Agora está segura no backend.
+const weatherState = { /* ... (código existente, sem alterações) ... */ };
 
-/**
- * Objeto para manter o estado atual das preferências e dados do clima.
- * Isso evita chamadas desnecessárias à API.
- */
-const weatherState = {
-    cidade: null,
-    unidade: localStorage.getItem('weatherUnit') || 'metric', // 'metric' para Celsius, 'imperial' para Fahrenheit
-    diasParaMostrar: 5,
-    destaques: {
-        rain: false,
-        cold: false,
-        hot: false,
-    },
-    dadosCompletos: [], // Armazena os dados processados da API
-};
-
-/**
- * Busca a previsão de 5 dias CHAMANDO NOSSO PRÓPRIO BACKEND.
- * @param {string} cidade O nome da cidade.
- * @param {string} unidade 'metric' para Celsius ou 'imperial' para Fahrenheit.
- * @returns {Promise<object>} Os dados brutos da API de previsão.
- */
 async function getPrevisaoDoBackend(cidade, unidade) {
-    // !! MUDANÇA CRÍTICA !!
-    // A URL foi atualizada para apontar para o servidor no Render.com.
-    // Lembre-se de substituir pela URL do SEU serviço após fazer o deploy.
-    const backendBaseUrl = 'https://garagem-nova-a.onrender.com'; // <-- SUBSTITUA PELA SUA URL PÚBLICA DO RENDER!
-
     const backendUrl = `${backendBaseUrl}/api/previsao/${cidade}?unidade=${unidade}`;
-
     const response = await fetch(backendUrl);
-
-    // Se a resposta não for OK, pega a mensagem de erro que nosso backend enviou
     if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || `Erro ${response.status} ao contatar o backend.`);
     }
-
     return await response.json();
 }
-
-/**
- * Processa os dados brutos da API de previsão (retornados pelo nosso backend)
- * e os agrupa por dia.
- * @param {object} dadosAPI Dados brutos da API de forecast.
- * @returns {Array<object>} Um array de objetos, cada um representando um dia.
- */
+// ... (todas as outras funções de previsão do tempo, como processarDadosForecast, etc. permanecem aqui sem alteração) ...
 function processarDadosForecast(dadosAPI) {
     const previsoesPorDia = {};
     for (const previsao of dadosAPI.list) {
@@ -87,10 +51,6 @@ function processarDadosForecast(dadosAPI) {
         return dia;
     });
 }
-
-/**
- * Renderiza os cards de previsão na tela com base no estado atual.
- */
 function exibirPrevisaoDetalhada() {
     const container = document.getElementById('previsao-detalhada-resultado');
     if (weatherState.dadosCompletos.length === 0) {
@@ -125,10 +85,6 @@ function exibirPrevisaoDetalhada() {
     }).join('');
     adicionarListenersAosCards();
 }
-
-/**
- * Adiciona o evento de clique para expandir/recolher os detalhes de cada card de previsão.
- */
 function adicionarListenersAosCards() {
     document.querySelectorAll('.forecast-day').forEach(card => {
         card.addEventListener('click', () => {
@@ -137,10 +93,6 @@ function adicionarListenersAosCards() {
         });
     });
 }
-
-/**
- * Função principal que orquestra a busca e exibição do clima.
- */
 async function handleVerificarClima() {
     const cidadeInput = document.getElementById('destino-viagem');
     weatherState.cidade = cidadeInput.value.trim();
@@ -156,10 +108,78 @@ async function handleVerificarClima() {
     }
 }
 
+
+// ========================================================================
+// --- NOVA SEÇÃO - API DE DICAS DE MANUTENÇÃO ---
+// ========================================================================
+
 /**
- * Configura todos os event listeners da aplicação.
+ * Busca as dicas gerais de manutenção no backend.
  */
+async function buscarDicasGerais() {
+    const listaContainer = document.getElementById('lista-dicas-gerais');
+    try {
+        const response = await fetch(`${backendBaseUrl}/api/dicas-manutencao`);
+        if (!response.ok) throw new Error('Erro ao buscar dicas gerais.');
+        
+        const dicas = await response.json();
+        exibirDicas(dicas, listaContainer);
+    } catch (error) {
+        listaContainer.innerHTML = `<li style="color: var(--danger);">${error.message}</li>`;
+    }
+}
+
+/**
+ * Busca dicas específicas para um tipo de veículo.
+ */
+async function buscarDicasEspecificas() {
+    const tipoVeiculo = document.getElementById('tipo-veiculo-input').value.trim();
+    const listaContainer = document.getElementById('lista-dicas-especificas');
+
+    if (!tipoVeiculo) {
+        listaContainer.innerHTML = `<li style="color: var(--warning);">Por favor, digite um tipo de veículo.</li>`;
+        return;
+    }
+
+    try {
+        const response = await fetch(`${backendBaseUrl}/api/dicas-manutencao/${tipoVeiculo}`);
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Erro desconhecido.');
+        }
+        
+        const dicas = await response.json();
+        exibirDicas(dicas, listaContainer);
+    } catch (error) {
+        listaContainer.innerHTML = `<li style="color: var(--danger);">${error.message}</li>`;
+    }
+}
+
+/**
+ * Função genérica para exibir uma lista de dicas na UI.
+ * @param {Array<object>} dicas - Array de objetos, cada um com uma propriedade 'dica'.
+ * @param {HTMLElement} container - O elemento UL onde as dicas serão inseridas.
+ */
+function exibirDicas(dicas, container) {
+    container.innerHTML = ''; // Limpa a lista anterior
+    if (dicas.length === 0) {
+        container.innerHTML = '<li>Nenhuma dica encontrada.</li>';
+        return;
+    }
+    dicas.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = item.dica;
+        container.appendChild(li);
+    });
+}
+
+
+// ========================================================================
+// --- CONFIGURAÇÃO DOS EVENT LISTENERS ---
+// ========================================================================
+
 function configurarEventListeners() {
+    // ... (listeners existentes, como 'add-vehicle-form' e 'maintenance-form') ...
     document.getElementById('add-vehicle-form').addEventListener('submit', (e) => {
         e.preventDefault();
         const tipo = document.getElementById('vehicle-type').value;
@@ -189,11 +209,11 @@ function configurarEventListeners() {
         atualizarUICompleta();
         e.target.reset();
     });
-
-    // --- LISTENERS PARA O PLANEJADOR DE VIAGEM INTERATIVO ---
+    
+    // Listeners do planejador de viagem
     document.getElementById('verificar-clima-btn').addEventListener('click', handleVerificarClima);
-
-    document.querySelectorAll('.filter-btn').forEach(btn => {
+    // ... (outros listeners de clima) ...
+     document.querySelectorAll('.filter-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             document.querySelector('.filter-btn.active').classList.remove('active');
             e.target.classList.add('active');
@@ -219,6 +239,11 @@ function configurarEventListeners() {
         }
     });
 
+    // --- NOVOS LISTENERS PARA AS DICAS ---
+    document.getElementById('buscar-dicas-gerais-btn').addEventListener('click', buscarDicasGerais);
+    document.getElementById('buscar-dicas-especificas-btn').addEventListener('click', buscarDicasEspecificas);
+
+    // Listener geral para botões de veículo
     document.querySelector('.main-container').addEventListener('click', (e) => {
         const target = e.target;
         if (target.matches('.selector-btn')) {
@@ -235,9 +260,7 @@ function configurarEventListeners() {
     });
 }
 
-/**
- * Função central que atualiza toda a interface do usuário.
- */
+// ... (todas as funções de atualizarUICompleta, atualizarPainelVeiculo, etc. permanecem aqui sem alteração) ...
 function atualizarUICompleta() {
     const veiculo = garagem.veiculoAtual;
     atualizarPainelVeiculo(veiculo);
@@ -245,8 +268,6 @@ function atualizarUICompleta() {
     atualizarControlesEspecificos(veiculo);
     atualizarPainelManutencao(veiculo);
 }
-
-// --- FUNÇÕES DE ATUALIZAÇÃO DA UI (GARAGEM) ---
 function atualizarPainelVeiculo(veiculo) {
     const infoBox = document.getElementById('vehicle-info');
     const img = document.getElementById('vehicle-image');
@@ -266,7 +287,6 @@ function atualizarPainelVeiculo(veiculo) {
         document.getElementById('speed-text').textContent = '0 km/h';
     }
 }
-
 function atualizarSeletores(veiculo) {
     const selectorContainer = document.querySelector('.vehicle-selector');
     selectorContainer.innerHTML = '';
@@ -281,7 +301,6 @@ function atualizarSeletores(veiculo) {
         selectorContainer.appendChild(btn);
     });
 }
-
 function atualizarControlesEspecificos(veiculo) {
     const specificControls = document.getElementById('specific-controls');
     specificControls.innerHTML = '';
@@ -294,7 +313,6 @@ function atualizarControlesEspecificos(veiculo) {
             </div>`;
     }
 }
-
 function atualizarPainelManutencao(veiculo) {
     const historyDiv = document.getElementById('maintenance-history');
     const title = document.getElementById('maintenance-title');
