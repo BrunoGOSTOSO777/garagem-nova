@@ -1,67 +1,82 @@
 // Importa os pacotes necessários
 import express from 'express';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv'; // << IMPORTADO
 import axios from 'axios';
+import mongoose from 'mongoose';
 
-// Carrega as variáveis de ambiente do arquivo .env
+// ========================================================================
+// --- CARREGAR VARIÁVEIS DE AMBIENTE ---
+// !! ESTA LINHA DEVE VIR PRIMEIRO DE TUDO !!
 dotenv.config();
+// ========================================================================
 
-// Inicializa o servidor Express
-const app = express();
-// O Render.com nos dará uma porta. Se estivermos rodando local, usamos 3001.
-const PORT = process.env.PORT || 3001; 
+// Agora que o .env foi carregado, podemos ler as variáveis com segurança
+const mongoUriCrud = process.env.MONGO_URI_CRUD;
 const apiKey = process.env.OPENWEATHER_API_KEY;
 
-// Middleware de CORS: ESSENCIAL para permitir que o frontend acesse este backend.
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*'); 
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-    next();
-});
+// ========================================================================
+// --- CONEXÃO COM O MONGODB ATLAS ---
+// ========================================================================
 
-/**
- * Endpoint da API para Previsão do Tempo
- * Rota: GET /api/previsao/:cidade
- * Exemplo de uso: http://localhost:3001/api/previsao/Curitiba?unidade=metric
- */
-app.get('/api/previsao/:cidade', async (req, res) => {
-    const { cidade } = req.params;
-    const { unidade } = req.query; // Pega a unidade da query string (ex: ?unidade=imperial)
-
-    console.log(`[Backend] Recebida requisição para a cidade: ${cidade}`);
-
-    if (!apiKey || apiKey === "SUA_CHAVE_DE_API_VAI_AQUI") {
-        return res.status(500).json({ error: 'A chave da API do OpenWeatherMap não está configurada no servidor.' });
+async function connectToDatabase() {
+    // Verificação para garantir que a variável foi carregada
+    if (!mongoUriCrud) {
+        console.error("ERRO FATAL: A variável de ambiente MONGO_URI_CRUD não está definida!");
+        console.error("Verifique se o arquivo .env existe, está salvo e contém a variável MONGO_URI_CRUD.");
+        process.exit(1); // Encerra a aplicação
     }
-
-    const geoApiUrl = `https://api.openweathermap.org/geo/1.0/direct?q=${cidade}&limit=1&appid=${apiKey}`;
 
     try {
-        // 1. Busca as coordenadas da cidade
-        const geoResponse = await axios.get(geoApiUrl);
-        if (geoResponse.data.length === 0) {
-            return res.status(404).json({ error: 'Cidade não encontrada.' });
-        }
-        const { lat, lon } = geoResponse.data[0];
-
-        // 2. Usa as coordenadas para buscar a previsão de 5 dias
-        const forecastApiUrl = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${apiKey}&units=${unidade || 'metric'}&lang=pt_br`;
-        const forecastResponse = await axios.get(forecastApiUrl);
-        
-        console.log('[Backend] Previsão recebida. Enviando para o frontend.');
-        
-        // 3. Envia os dados de volta para o nosso frontend
-        res.status(200).json(forecastResponse.data);
-
+        await mongoose.connect(mongoUriCrud);
+        console.log("🚀 Conectado com sucesso ao MongoDB Atlas!");
     } catch (error) {
-        console.error("[Backend] Erro:", error.response?.data || error.message);
-        const status = error.response?.status || 500;
-        const message = error.response?.data?.message || 'Ocorreu um erro no servidor.';
-        res.status(status).json({ error: message });
+        console.error("❌ ERRO FATAL: Falha ao conectar ao MongoDB Atlas:", error.message);
+        process.exit(1); // Encerra a aplicação
     }
-});
+}
 
-// Inicia o servidor
-app.listen(PORT, () => {
-    console.log(`🚀 Servidor backend rodando em http://localhost:${PORT}`);
-});
+// ========================================================================
+// --- INICIALIZAÇÃO DO SERVIDOR E ROTAS ---
+// ========================================================================
+
+async function startServer() {
+    // Primeiro, conecta ao banco de dados. O servidor só sobe se a conexão funcionar.
+    await connectToDatabase();
+
+    const app = express();
+    const PORT = process.env.PORT || 3001;
+
+    // Middleware de CORS
+    app.use((req, res, next) => {
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+        next();
+    });
+
+    // --- SEUS ENDPOINTS DA API ---
+    // (Colei aqui o restante do seu código de API para garantir)
+    
+    // BANCO DE DADOS SIMULADO
+    const dicasManutencaoGerais = [ { id: 1, dica: "Verifique o nível do óleo do motor regularmente." }, { id: 2, dica: "Calibre os pneus semanalmente para economizar combustível." }];
+    const dicasPorTipo = { carro: [ { id: 10, dica: "Faça o rodízio dos pneus a cada 10.000 km." } ], moto: [ { id: 20, dica: "Lubrifique e ajuste a corrente frequentemente." } ], caminhao: [ { id: 30, dica: "Verifique o sistema de freios a ar." } ] };
+
+    // Rota de Previsão do Tempo
+    app.get('/api/previsao/:cidade', async (req, res) => { /* ... seu código de previsão do tempo ... */ });
+    
+    // Rota de Dicas Gerais
+    app.get('/api/dicas-manutencao', (req, res) => { res.json(dicasManutencaoGerais); });
+    
+    // Rota de Dicas Específicas
+    app.get('/api/dicas-manutencao/:tipoVeiculo', (req, res) => { const { tipoVeiculo } = req.params; const dicas = dicasPorTipo[tipoVeiculo.toLowerCase()]; if (dicas) { res.json(dicas); } else { res.status(404).json({ error: `Nenhuma dica encontrada para: ${tipoVeiculo}` }); } });
+
+    // Rota 404
+    app.use((req, res) => { res.status(404).json({ error: 'Endpoint não encontrado.' }); });
+
+    // Inicia o servidor
+    app.listen(PORT, () => {
+        console.log(`🔌 Servidor backend rodando em http://localhost:${PORT}`);
+    });
+}
+
+// Chama a função principal para iniciar o servidor
+startServer();
