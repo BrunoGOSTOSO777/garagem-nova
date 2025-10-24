@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garagem Inteligente - Previsão Interativa</title>
+    <title>Garagem Inteligente - Versão Completa</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
     <main class="main-container">
-        <!-- Coluna da Garagem (Interação) -->
+        <!-- Coluna da Garagem Interativa (Client-Side) -->
         <section class="garage-container">
             <header>
                 <h1>Garagem Inteligente</h1>
@@ -44,11 +44,12 @@
         <!-- Coluna de Gerenciamento -->
         <aside class="maintenance-container">
             <header>
-                <h2>Gerenciamento da Frota</h2>
+                <h2>Painel de Controle</h2>
             </header>
 
+            <!-- Formulário para a Garagem Visual (Client-Side) -->
             <div class="card">
-                <h3>Adicionar Novo Veículo</h3>
+                <h3>Adicionar à Garagem Visual</h3>
                 <form id="add-vehicle-form" class="form-grid">
                     <select id="vehicle-type" required>
                         <option value="" disabled selected>Selecione o Tipo</option>
@@ -56,81 +57,69 @@
                         <option value="CarroEsportivo">Carro Esportivo</option>
                         <option value="Caminhao">Caminhão</option>
                     </select>
-                    <input type="text" id="vehicle-model" placeholder="Modelo (ex: Onix)" required>
-                    <button type="submit">Adicionar à Garagem</button>
+                    <!-- ID único para o modelo da garagem visual -->
+                    <input type="text" id="vehicle-model-legacy" placeholder="Modelo (ex: Fusca)" required>
+                    <button type="submit">Adicionar à Simulação</button>
+                </form>
+            </div>
+
+            <!-- Formulário para o Banco de Dados (CRUD) -->
+            <div class="card">
+                <h3>Adicionar à Frota (Banco de Dados)</h3>
+                <form id="add-vehicle-db-form" class="form-grid">
+                    <input type="text" id="vehicle-placa" name="placa" placeholder="Placa (ex: ABC1D23)" required maxlength="7">
+                    <input type="text" id="vehicle-marca" name="marca" placeholder="Marca (ex: Chevrolet)" required>
+                    <!-- ID único para o modelo do DB -->
+                    <input type="text" id="vehicle-modelo-db" name="modelo" placeholder="Modelo (ex: Onix)" required>
+                    <input type="number" id="vehicle-ano" name="ano" placeholder="Ano (ex: 2023)" required min="1900">
+                    <input type="text" id="vehicle-cor" name="cor" placeholder="Cor (ex: Prata)">
+                    <button type="submit">Salvar no DB</button>
+                    <p id="form-error-message" class="form-error"></p>
                 </form>
             </div>
             
+            <!-- Lista da Frota do Banco de Dados -->
             <div class="card">
-                <h3>Planejador de Viagem Interativo</h3>
+                <h3>Frota no Banco de Dados</h3>
+                <ul id="lista-frota-db" class="frota-lista">
+                    <!-- A lista de veículos será inserida aqui -->
+                </ul>
+            </div>
+
+            <!-- Planejador de Viagem -->
+            <div class="card">
+                <h3>Planejador de Viagem</h3>
                 <div class="weather-form">
                     <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
                     <button id="verificar-clima-btn">Verificar Clima</button>
                 </div>
-
-                <!-- Controles de Interatividade -->
-                <div id="weather-controls">
-                    <div class="control-group">
-                        <label>Mostrar:</label>
-                        <button class="filter-btn" data-days="1">1 Dia</button>
-                        <button class="filter-btn" data-days="3">3 Dias</button>
-                        <button class="filter-btn active" data-days="5">5 Dias</button>
-                    </div>
-                    <div class="control-group">
-                        <label class="unit-switch">
-                            <span>°C</span>
-                            <input type="checkbox" id="unit-toggle">
-                            <span class="slider"></span>
-                            <span>°F</span>
-                        </label>
-                    </div>
-                    <div class="control-group highlight-group">
-                        <label><input type="checkbox" data-highlight="rain"> Destacar Chuva</label>
-                        <label><input type="checkbox" data-highlight="cold"> Destacar Frio (&lt;10°C)</label>
-                        <label><input type="checkbox" data-highlight="hot"> Destacar Calor (&gt;30°C)</label>
-                    </div>
-                </div>
-
-                <div id="previsao-detalhada-resultado">
-                    <!-- Os cards da previsão serão inseridos aqui -->
-                </div>
-            </div>
-
-            <!-- NOVO CARD PARA DICAS DE MANUTENÇÃO -->
-            <div class="card">
-                <h3>Dicas Rápidas de Manutenção</h3>
-                <div id="dicas-gerais-container">
-                    <button id="buscar-dicas-gerais-btn">Ver Dicas Gerais</button>
-                    <ul id="lista-dicas-gerais"></ul>
-                </div>
-                <h4 style="margin-top: 1.5rem;">Dicas Específicas</h4>
-                <div id="dicas-especificas-container" class="form-grid">
-                    <input type="text" id="tipo-veiculo-input" placeholder="Digite o tipo (carro, moto, caminhao)">
-                    <button id="buscar-dicas-especificas-btn">Buscar</button>
-                    <ul id="lista-dicas-especificas" style="grid-column: 1 / -1;"></ul>
-                </div>
-            </div>
-            <!-- FIM DO NOVO CARD -->
-
-            <div class="card">
-                <h3 id="maintenance-title">Manutenção do Veículo</h3>
-                <div id="maintenance-history">
-                    <p>Selecione um veículo para ver o histórico.</p>
-                </div>
-                <h4>Agendar Novo Serviço</h4>
-                <form id="maintenance-form">
-                    <input type="date" id="maint-date" required>
-                    <input type="text" id="maint-type" placeholder="Serviço (ex: Troca de óleo)" required>
-                    <input type="number" id="maint-cost" placeholder="Custo (R$)" min="0" step="0.01" required>
-                    <textarea id="maint-desc" placeholder="Descrição detalhada (opcional)"></textarea>
-                    <button type="submit" id="maint-submit-btn" disabled>Agendar Serviço</button>
-                </form>
+                <div id="previsao-detalhada-resultado" style="margin-top: 1rem;"></div>
             </div>
             
         </aside>
     </main>
     
     <script type="module" src="main.js"></script>
+
+    <!-- MODAL DE EDIÇÃO (Começa escondido) -->
+    <div id="edit-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-content">
+            <header class="modal-header">
+                <h2>Editar Veículo</h2>
+                <button id="close-modal-btn" class="close-btn">&times;</button>
+            </header>
+            <form id="edit-vehicle-form" class="form-grid">
+                <input type="hidden" id="edit-vehicle-id">
+                <input type="text" id="edit-vehicle-placa" name="placa" placeholder="Placa" required maxlength="7">
+                <input type="text" id="edit-vehicle-marca" name="marca" placeholder="Marca" required>
+                <input type="text" id="edit-vehicle-modelo" name="modelo" placeholder="Modelo" required>
+                <input type="number" id="edit-vehicle-ano" name="ano" placeholder="Ano" required min="1900">
+                <input type="text" id="edit-vehicle-cor" name="cor" placeholder="Cor">
+                <button type="submit">Salvar Alterações</button>
+                <p id="edit-form-error-message" class="form-error"></p>
+            </form>
+        </div>
+    </div>
 
 </body>
 </html>
