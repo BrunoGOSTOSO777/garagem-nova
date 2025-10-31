@@ -3,123 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garagem Inteligente - Versão Completa</title>
+    <title>Garagem Inteligente - Login</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <main class="main-container">
-        <!-- Coluna da Garagem Interativa (Client-Side) -->
-        <section class="garage-container">
-            <header>
-                <h1>Garagem Inteligente</h1>
-                <nav class="vehicle-selector"></nav>
-            </header>
-            <div class="vehicle-panel">
-                <img id="vehicle-image" src="imagens/placeholder.png" alt="Imagem do Veículo Selecionado">
-                <div class="status-indicator-container">
-                    Status: <span id="status-indicator" class="status-off">●</span> <span id="status-text">Desligado</span>
-                </div>
-                <div class="speedometer-container">
-                    <label for="speed-bar">Velocidade:</label>
-                    <progress id="speed-bar" value="0" max="300"></progress>
-                    <span id="speed-text">0 km/h</span>
-                </div>
-                <div id="vehicle-info" class="info-box">
-                    <p>Adicione um veículo para começar.</p>
-                </div>
-                <div class="controls-section">
-                    <h3>Controles Gerais</h3>
-                    <div class="button-group general-controls">
-                        <button data-action="ligar">Ligar</button>
-                        <button data-action="desligar">Desligar</button>
-                        <button data-action="acelerar">Acelerar</button>
-                        <button data-action="frear">Frear</button>
-                    </div>
-                </div>
-                <div id="specific-controls" class="controls-section"></div>
-            </div>
-        </section>
-
-        <!-- Coluna de Gerenciamento -->
-        <aside class="maintenance-container">
-            <header>
-                <h2>Painel de Controle</h2>
-            </header>
-
-            <!-- Formulário para a Garagem Visual (Client-Side) -->
-            <div class="card">
-                <h3>Adicionar à Garagem Visual</h3>
-                <form id="add-vehicle-form" class="form-grid">
-                    <select id="vehicle-type" required>
-                        <option value="" disabled selected>Selecione o Tipo</option>
-                        <option value="Carro">Carro</option>
-                        <option value="CarroEsportivo">Carro Esportivo</option>
-                        <option value="Caminhao">Caminhão</option>
-                    </select>
-                    <!-- ID único para o modelo da garagem visual -->
-                    <input type="text" id="vehicle-model-legacy" placeholder="Modelo (ex: Fusca)" required>
-                    <button type="submit">Adicionar à Simulação</button>
+    <!-- TELA DE AUTENTICAÇÃO (LOGIN / REGISTRO) -->
+    <div id="auth-view">
+        <div class="auth-container">
+            <!-- Formulário de Login -->
+            <div id="login-form-container" class="form-container">
+                <h2>Login na Garagem</h2>
+                <form id="login-form">
+                    <input type="email" id="login-email" placeholder="E-mail" required>
+                    <input type="password" id="login-password" placeholder="Senha" required>
+                    <button type="submit">Entrar</button>
+                    <p id="login-error" class="form-error"></p>
                 </form>
+                <p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
             </div>
 
-            <!-- Formulário para o Banco de Dados (CRUD) -->
+            <!-- Formulário de Registro -->
+            <div id="register-form-container" class="form-container" style="display: none;">
+                <h2>Registrar Nova Conta</h2>
+                <form id="register-form">
+                    <input type="email" id="register-email" placeholder="E-mail" required>
+                    <input type="password" id="register-password" placeholder="Senha (mín. 6 caracteres)" required>
+                    <button type="submit">Registrar</button>
+                    <p id="register-error" class="form-error"></p>
+                    <p id="register-success" class="form-success"></p>
+                </form>
+                <p>Já tem uma conta? <a href="#" id="show-login">Faça login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- TELA PRINCIPAL DA APLICAÇÃO (GARAGEM) -->
+    <main id="app-view" class="main-container" style="display: none; max-width: 800px; margin: auto;">
+        <aside class="maintenance-container" style="flex: 1 1 100%;">
+            <header class="app-header">
+                <h2>Minha Garagem</h2>
+                <button id="logout-btn">Sair</button>
+            </header>
             <div class="card">
-                <h3>Adicionar à Frota (Banco de Dados)</h3>
-                <form id="add-vehicle-db-form" class="form-grid">
-                    <input type="text" id="vehicle-placa" name="placa" placeholder="Placa (ex: ABC1D23)" required maxlength="7">
-                    <input type="text" id="vehicle-marca" name="marca" placeholder="Marca (ex: Chevrolet)" required>
-                    <!-- ID único para o modelo do DB -->
-                    <input type="text" id="vehicle-modelo-db" name="modelo" placeholder="Modelo (ex: Onix)" required>
-                    <input type="number" id="vehicle-ano" name="ano" placeholder="Ano (ex: 2023)" required min="1900">
-                    <input type="text" id="vehicle-cor" name="cor" placeholder="Cor (ex: Prata)">
-                    <button type="submit">Salvar no DB</button>
+                <h3>Adicionar Novo Veículo</h3>
+                <form id="add-vehicle-form" class="form-grid">
+                    <input type="text" id="vehicle-placa" placeholder="Placa" required maxlength="7">
+                    <input type="text" id="vehicle-marca" placeholder="Marca" required>
+                    <input type="text" id="vehicle-modelo" placeholder="Modelo" required>
+                    <input type="number" id="vehicle-ano" placeholder="Ano" required min="1900">
+                    <input type="text" id="vehicle-cor" placeholder="Cor">
+                    <button type="submit">Adicionar à Frota</button>
                     <p id="form-error-message" class="form-error"></p>
                 </form>
             </div>
-            
-            <!-- Lista da Frota do Banco de Dados -->
             <div class="card">
                 <h3>Frota no Banco de Dados</h3>
-                <ul id="lista-frota-db" class="frota-lista">
-                    <!-- A lista de veículos será inserida aqui -->
-                </ul>
+                <ul id="lista-frota-db" class="frota-lista"></ul>
             </div>
-
-            <!-- Planejador de Viagem -->
-            <div class="card">
-                <h3>Planejador de Viagem</h3>
-                <div class="weather-form">
-                    <input type="text" id="destino-viagem" placeholder="Digite a cidade de destino">
-                    <button id="verificar-clima-btn">Verificar Clima</button>
-                </div>
-                <div id="previsao-detalhada-resultado" style="margin-top: 1rem;"></div>
-            </div>
-            
         </aside>
     </main>
     
     <script type="module" src="main.js"></script>
-
-    <!-- MODAL DE EDIÇÃO (Começa escondido) -->
-    <div id="edit-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <header class="modal-header">
-                <h2>Editar Veículo</h2>
-                <button id="close-modal-btn" class="close-btn">&times;</button>
-            </header>
-            <form id="edit-vehicle-form" class="form-grid">
-                <input type="hidden" id="edit-vehicle-id">
-                <input type="text" id="edit-vehicle-placa" name="placa" placeholder="Placa" required maxlength="7">
-                <input type="text" id="edit-vehicle-marca" name="marca" placeholder="Marca" required>
-                <input type="text" id="edit-vehicle-modelo" name="modelo" placeholder="Modelo" required>
-                <input type="number" id="edit-vehicle-ano" name="ano" placeholder="Ano" required min="1900">
-                <input type="text" id="edit-vehicle-cor" name="cor" placeholder="Cor">
-                <button type="submit">Salvar Alterações</button>
-                <p id="edit-form-error-message" class="form-error"></p>
-            </form>
-        </div>
-    </div>
-
 </body>
 </html>
