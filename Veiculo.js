@@ -6,11 +6,15 @@ const veiculoSchema = new mongoose.Schema({
     modelo: { type: String, required: true },
     ano: { type: Number, required: true, min: 1900 },
     cor: { type: String },
-    // --- O CAMPO DE RELACIONAMENTO ---
     owner: {
-        type: mongoose.Schema.Types.ObjectId, // Armazena o ID do usuário
-        ref: 'User', // A referência ao modelo 'User'
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
         required: true
+    },
+    // --- NOVO CAMPO PARA A IMAGEM ---
+    imageUrl: {
+        type: String,
+        default: '' // Valor padrão caso nenhuma imagem seja enviada
     }
 }, { 
     timestamps: true 

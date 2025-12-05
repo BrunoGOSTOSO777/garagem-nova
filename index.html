@@ -8,51 +8,30 @@
 </head>
 <body>
 
-    <!-- TELA DE AUTENTICAÇÃO (LOGIN / REGISTRO) -->
+    <!-- TELA DE AUTENTICAÇÃO -->
     <div id="auth-view">
-        <div class="auth-container">
-            <!-- Formulário de Login -->
-            <div id="login-form-container" class="form-container">
-                <h2>Login na Garagem</h2>
-                <form id="login-form">
-                    <input type="email" id="login-email" placeholder="E-mail" required>
-                    <input type="password" id="login-password" placeholder="Senha" required>
-                    <button type="submit">Entrar</button>
-                    <p id="login-error" class="form-error"></p>
-                </form>
-                <p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p>
-            </div>
-
-            <!-- Formulário de Registro -->
-            <div id="register-form-container" class="form-container" style="display: none;">
-                <h2>Registrar Nova Conta</h2>
-                <form id="register-form">
-                    <input type="email" id="register-email" placeholder="E-mail" required>
-                    <input type="password" id="register-password" placeholder="Senha (mín. 6 caracteres)" required>
-                    <button type="submit">Registrar</button>
-                    <p id="register-error" class="form-error"></p>
-                    <p id="register-success" class="form-success"></p>
-                </form>
-                <p>Já tem uma conta? <a href="#" id="show-login">Faça login</a></p>
-            </div>
-        </div>
+        <!-- ...código da autenticação mantido... -->
+        <div class="auth-container"><h1 class="welcome-title">Bem-vindo à Garagem Social</h1><div id="login-form-container" class="form-container"><h2>Login</h2><form id="login-form"><input type="email" id="login-email" placeholder="E-mail" required><input type="password" id="login-password" placeholder="Senha" required><button type="submit">Entrar</button><p id="login-error" class="form-error"></p></form><p>Não tem uma conta? <a href="#" id="show-register">Registre-se</a></p></div><div id="register-form-container" class="form-container" style="display: none;"><h2>Registrar</h2><form id="register-form"><input type="email" id="register-email" placeholder="E-mail" required><input type="password" id="register-password" placeholder="Senha (mín. 6 caracteres)" required><button type="submit">Registrar</button><p id="register-error" class="form-error"></p><p id="register-success" class="form-success"></p></form><p>Já tem uma conta? <a href="#" id="show-login">Faça login</a></p></div></div>
     </div>
 
-    <!-- TELA PRINCIPAL DA APLICAÇÃO (GARAGEM) -->
+    <!-- TELA PRINCIPAL DA APLICAÇÃO -->
     <main id="app-view" class="main-container" style="display: none; max-width: 800px; margin: auto;">
         <aside class="maintenance-container" style="flex: 1 1 100%;">
-            <header class="app-header">
-                <h2>Minha Garagem</h2>
-                <button id="logout-btn">Sair</button>
-            </header>
+            <header class="app-header"><h2>Minha Garagem</h2><button id="logout-btn">Sair</button></header>
             <div class="card">
                 <h3>Adicionar Novo Veículo</h3>
-                <form id="add-vehicle-form" class="form-grid">
-                    <input type="text" id="vehicle-placa" placeholder="Placa" required maxlength="7">
-                    <input type="text" id="vehicle-marca" placeholder="Marca" required>
-                    <input type="text" id="vehicle-modelo" placeholder="Modelo" required>
-                    <input type="number" id="vehicle-ano" placeholder="Ano" required min="1900">
-                    <input type="text" id="vehicle-cor" placeholder="Cor">
+                <!-- ATENÇÃO: enctype="multipart/form-data" é ESSENCIAL para o upload -->
+                <form id="add-vehicle-form" class="form-grid" enctype="multipart/form-data">
+                    <input type="text" id="vehicle-placa" name="placa" placeholder="Placa" required maxlength="7">
+                    <input type="text" id="vehicle-marca" name="marca" placeholder="Marca" required>
+                    <input type="text" id="vehicle-modelo" name="modelo" placeholder="Modelo" required>
+                    <input type="number" id="vehicle-ano" name="ano" placeholder="Ano" required min="1900">
+                    <input type="text" id="vehicle-cor" name="cor" placeholder="Cor">
+                    <!-- NOVO CAMPO DE UPLOAD DE IMAGEM -->
+                    <div class="file-input-wrapper">
+                        <label for="vehicle-image-upload">Escolher Imagem do Veículo</label>
+                        <input type="file" id="vehicle-image-upload" name="imagem" accept="image/*">
+                    </div>
                     <button type="submit">Adicionar à Frota</button>
                     <p id="form-error-message" class="form-error"></p>
                 </form>

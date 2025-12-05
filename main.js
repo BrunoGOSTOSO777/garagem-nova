@@ -1,72 +1,39 @@
 const backendBaseUrl = 'http://localhost:3001';
 
-// --- SELETORES DE ELEMENTOS ---
 const authView = document.getElementById('auth-view');
 const appView = document.getElementById('app-view');
 const listaContainer = document.getElementById('lista-frota-db');
 
-// --- FUNÇÕES DE API ---
-async function apiCall(endpoint, method = 'GET', body = null) {
-    const headers = { 'Content-Type': 'application/json' };
+// --- LÓGICA DE AUTENTICAÇÃO ---
+async function apiCall(endpoint, method = 'GET', body = null, isFormData = false) {
+    const headers = {};
     const token = localStorage.getItem('token');
     if (token) {
         headers['Authorization'] = `Bearer ${token}`;
     }
-
+    if (!isFormData) {
+        headers['Content-Type'] = 'application/json';
+    }
     const options = { method, headers };
     if (body) {
-        options.body = JSON.stringify(body);
+        options.body = isFormData ? body : JSON.stringify(body);
     }
-
     const response = await fetch(`${backendBaseUrl}${endpoint}`, options);
     const data = await response.json();
-
     if (!response.ok) {
-        throw new Error(data.error || `Erro na requisição: ${response.status}`);
+        throw new Error(data.error || `Erro ${response.status}`);
     }
     return data;
 }
 
-// --- LÓGICA DE AUTENTICAÇÃO ---
-async function handleRegister(e) {
-    e.preventDefault();
-    const email = document.getElementById('register-email').value;
-    const password = document.getElementById('register-password').value;
-    const errorEl = document.getElementById('register-error');
-    const successEl = document.getElementById('register-success');
-    errorEl.textContent = '';
-    successEl.textContent = '';
-    try {
-        const data = await apiCall('/api/auth/register', 'POST', { email, password });
-        successEl.textContent = data.message;
-        e.target.reset();
-    } catch (error) {
-        errorEl.textContent = error.message;
-    }
-}
-
-async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    const errorEl = document.getElementById('login-error');
-    errorEl.textContent = '';
-    try {
-        const data = await apiCall('/api/auth/login', 'POST', { email, password });
-        localStorage.setItem('token', data.token);
-        initApp(); // Inicia a aplicação principal
-    } catch (error) {
-        errorEl.textContent = error.message;
-    }
-}
-
-function handleLogout() {
-    localStorage.removeItem('token');
-    initApp(); // Reavalia a UI, que agora mostrará a tela de login
-}
+async function handleRegister(e) { /* ... código mantido ... */ }
+async function handleLogin(e) { /* ... código mantido ... */ }
+function handleLogout() { localStorage.removeItem('token'); initApp(); }
+async function handleRegister(e){e.preventDefault();const t=document.getElementById("register-email").value,o=document.getElementById("register-password").value,n=document.getElementById("register-error"),c=document.getElementById("register-success");n.textContent="",c.textContent="";try{const e=await apiCall("/api/auth/register","POST",{email:t,password:o});c.textContent=e.message+" Agora você pode fazer login.",document.getElementById("register-form").reset()}catch(e){n.textContent=e.error}}async function handleLogin(e){e.preventDefault();const t=document.getElementById("login-email").value,o=document.getElementById("login-password").value,n=document.getElementById("login-error");n.textContent="";try{const e=await apiCall("/api/auth/login","POST",{email:t,password:o});localStorage.setItem("token",e.token),initApp()}catch(e){n.textContent=e.error}}
 
 // --- LÓGICA DO CRUD DE VEÍCULOS ---
 async function buscarEExibirVeiculos() {
+    if (!listaContainer) return;
     listaContainer.innerHTML = '<li>Carregando frota...</li>';
     try {
         const veiculos = await apiCall('/api/veiculos');
@@ -76,29 +43,41 @@ async function buscarEExibirVeiculos() {
         } else {
             veiculos.forEach(v => {
                 const li = document.createElement('li');
-                li.innerHTML = `<span>${v.placa} - ${v.marca} ${v.modelo}</span><div class="action-buttons"><button class="btn-delete" data-id="${v._id}">Excluir</button></div>`;
+                // Constrói a URL da imagem. Usa um placeholder se não houver imagem.
+                const imageUrl = v.imageUrl ? `${backendBaseUrl}/${v.imageUrl}` : 'https://via.placeholder.com/100x60.png?text=Sem+Foto';
+                
+                li.innerHTML = `
+                    <img src="${imageUrl}" alt="Foto de ${v.modelo}" class="vehicle-image">
+                    <div class="vehicle-details">
+                        ${v.placa} - ${v.marca} ${v.modelo}
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn-delete" data-id="${v._id}">Excluir</button>
+                    </div>
+                `;
                 listaContainer.appendChild(li);
             });
         }
     } catch (error) {
-        listaContainer.innerHTML = `<li style="color: var(--danger);">${error.message}</li>`;
+        if (error.message.includes('Token')) handleLogout();
+        else listaContainer.innerHTML = `<li style="color: var(--danger);">${error.message}</li>`;
     }
 }
 
+// --- LÓGICA DE ADICIONAR VEÍCULO ATUALIZADA PARA USAR FORMDATA ---
 async function handleAdicionarVeiculo(e) {
     e.preventDefault();
     const form = e.target;
     const msgEl = document.getElementById('form-error-message');
     msgEl.textContent = '';
-    const data = {
-        placa: form.querySelector('#vehicle-placa').value,
-        marca: form.querySelector('#vehicle-marca').value,
-        modelo: form.querySelector('#vehicle-modelo').value,
-        ano: form.querySelector('#vehicle-ano').value,
-        cor: form.querySelector('#vehicle-cor').value,
-    };
+    
+    // 1. Cria um objeto FormData diretamente do elemento do formulário.
+    // Ele captura todos os campos, incluindo o de arquivo.
+    const formData = new FormData(form);
+
     try {
-        await apiCall('/api/veiculos', 'POST', data);
+        // 2. Chama a API enviando o FormData e indicando que não é JSON
+        await apiCall('/api/veiculos', 'POST', formData, true);
         form.reset();
         await buscarEExibirVeiculos();
     } catch (error) {
@@ -113,50 +92,23 @@ async function handleListaClick(e) {
             try {
                 await apiCall(`/api/veiculos/${id}`, 'DELETE');
                 await buscarEExibirVeiculos();
-            } catch (error) {
-                alert(error.message);
-            }
+            } catch (error) { alert(error.message); }
         }
     }
 }
 
 // --- CONTROLE DE UI E INICIALIZAÇÃO ---
-function updateView(isLoggedIn) {
-    if (isLoggedIn) {
-        authView.style.display = 'none';
-        appView.style.display = 'block';
-        buscarEExibirVeiculos();
-    } else {
-        authView.style.display = 'block';
-        appView.style.display = 'none';
-    }
-}
-
-function initApp() {
-    const token = localStorage.getItem('token');
-    if (token) {
-        updateView(true);
-    } else {
-        updateView(false);
-    }
-}
+function updateView(isLoggedIn) { /* ... código mantido ... */ }
+function initApp() { /* ... código mantido ... */ }
+function updateView(e){e?(authView.style.display="none",appView.style.display="block",buscarEExibirVeiculos()):(authView.style.display="block",appView.style.display="none")}function initApp(){const e=localStorage.getItem("token");updateView(!!e)}
 
 // Adiciona os listeners de eventos
-document.getElementById('register-form').addEventListener('submit', handleRegister);
-document.getElementById('login-form').addEventListener('submit', handleLogin);
-document.getElementById('logout-btn').addEventListener('click', handleLogout);
-document.getElementById('add-vehicle-form').addEventListener('submit', handleAdicionarVeiculo);
-listaContainer.addEventListener('click', handleListaClick);
-document.getElementById('show-register').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('login-form-container').style.display = 'none';
-    document.getElementById('register-form-container').style.display = 'block';
-});
-document.getElementById('show-login').addEventListener('click', (e) => {
-    e.preventDefault();
-    document.getElementById('register-form-container').style.display = 'none';
-    document.getElementById('login-form-container').style.display = 'block';
-});
+document.getElementById('register-form')?.addEventListener('submit', handleRegister);
+document.getElementById('login-form')?.addEventListener('submit', handleLogin);
+document.getElementById('logout-btn')?.addEventListener('click', handleLogout);
+document.getElementById('add-vehicle-form')?.addEventListener('submit', handleAdicionarVeiculo);
+listaContainer?.addEventListener('click', handleListaClick);
+document.getElementById('show-register')?.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('login-form-container').style.display = 'none'; document.getElementById('register-form-container').style.display = 'block'; });
+document.getElementById('show-login')?.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('register-form-container').style.display = 'none'; document.getElementById('login-form-container').style.display = 'block'; });
 
-// Inicializa a aplicação quando o DOM está pronto
 document.addEventListener('DOMContentLoaded', initApp);

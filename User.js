@@ -4,7 +4,7 @@ const userSchema = new mongoose.Schema({
     email: {
         type: String,
         required: [true, 'O e-mail é obrigatório.'],
-        unique: true, // Garante que não haja dois usuários com o mesmo e-mail
+        unique: true,
         lowercase: true,
         trim: true,
         match: [/\S+@\S+\.\S+/, 'Por favor, use um formato de e-mail válido.']
